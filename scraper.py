@@ -66,6 +66,15 @@ def job():
     scrape('swift', filename)
     scrape('javascript', filename)
     scrape('go', filename)
+    scrape('php', filename)
+    scrape('ruby', filename)
+    scrape('java', filename)
+    scrape('c', filename)
+    scrape('cpp', filename)
+    scrape('c#', filename)
+    scrape('typescript', filename)
+    scrape('rust', filename)
+    scrape('swift', filename)
 
     # git add commit push
     # git_add_commit_push(strdate, filename)
