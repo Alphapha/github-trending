@@ -5,6 +5,7 @@ import codecs
 import requests
 import os
 import time
+import re
 from pyquery import PyQuery as pq
 
 
@@ -40,18 +41,67 @@ def scrape(language, filename):
 
     # codecs to solve the problem utf-8 codec like chinese
     with codecs.open(filename, "a", "utf-8") as f:
-        f.write('\n#### {language}\n'.format(language=language))
+        f.write('\n#### {language}\n\n'.format(language=language))
+        f.write('| 排名 | 项目 | 描述 | 今日 Star | 总 Star | Fork | 语言 |\n')
+        f.write('|------|------|------|---------|---------|------|------|\n')
 
+        rank = 0
         for item in items:
+            rank += 1
             i = pq(item)
-            title = i(".lh-condensed a").text()
-            owner = i(".lh-condensed span.text-normal").text()
-            description = i("p.col-9").text()
-            url = i(".lh-condensed a").attr("href")
-            url = "https://github.com" + url
-            # ownerImg = i("p.repo-list-meta a img").attr("src")
-            # print(ownerImg)
-            f.write(u"* [{title}]({url}):{description}\n".format(title=title, url=url, description=description))
+            
+            repo_link = i.find(".lh-condensed a").eq(0)
+            repo_path = repo_link.attr("href") if repo_link else ""
+            
+            if repo_path:
+                path_parts = repo_path.strip('/').split('/')
+                owner = path_parts[0] if len(path_parts) > 0 else "Unknown"
+                title = path_parts[1] if len(path_parts) > 1 else "Unknown"
+            else:
+                owner = "Unknown"
+                title = "Unknown"
+            
+            repo_url = "https://github.com" + repo_path if repo_path else ""
+            
+            description = i("p.col-9").text().strip()
+            description = description.replace('\n', ' ').replace('|', '-')
+            
+            star_elements = i.find('a[href$="stargazers"]')
+            total_stars = '0'
+            today_stars = '0'
+            if star_elements and len(star_elements) > 0:
+                star_text = pq(star_elements[0]).text().strip()
+                total_stars = star_text.replace(',', '')
+            
+            metadata_elem = i.find('.f6.color-fg-muted.mt-2')
+            today_stars = '0'
+            if metadata_elem and len(metadata_elem) > 0:
+                metadata_text = pq(metadata_elem[0]).text()
+                match = re.search(r'(\d[\d,]*) stars today', metadata_text)
+                if match:
+                    today_stars = match.group(1).replace(',', '')
+            
+            fork_elements = i.find('a[href$="forks"]')
+            forks = '0'
+            if fork_elements and len(fork_elements) > 0:
+                forks = pq(fork_elements[0]).text().strip().replace(',', '')
+            
+            lang_elem = i.find('span[itemprop="programmingLanguage"]')
+            lang = lang_elem.text().strip() if lang_elem and len(lang_elem) > 0 else 'N/A'
+            
+            f.write(u"| {rank} | [{owner}/{title}]({url}) | {desc} | {today_stars} | {total_stars} | {forks} | {lang} |\n".format(
+                rank=rank,
+                owner=owner,
+                title=title,
+                url=repo_url,
+                desc=description,
+                today_stars=today_stars,
+                total_stars=total_stars,
+                forks=forks,
+                lang=lang
+            ))
+        
+        f.write('\n')
 
 
 def job():

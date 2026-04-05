@@ -4,6 +4,30 @@
 ## Intro
 Tracking the most popular Github repos, updated daily(Python version)
 
+## Features
+
+- 📊 表格化展示，信息更直观
+- ⭐ 显示总 Star 数
+- 📈 显示今日 Star 增长数
+- 🍴 显示 Fork 数量
+- 💻 显示编程语言类型
+- 🏆 显示项目排名
+- 🔗 提供项目链接直达
+
+## Output Format
+
+生成的 Markdown 文件包含以下信息：
+
+| 字段 | 说明 |
+|------|------|
+| 排名 | 项目在当日榜单中的排名 |
+| 项目 | 项目名称（owner/repo 格式） |
+| 描述 | 项目简介 |
+| 今日 Star | 当日新增 Star 数 |
+| 总 Star | 项目累计 Star 总数 |
+| Fork | 项目 Fork 数量 |
+| 语言 | 项目主要编程语言 |
+
 ## Run
 
 You need install `pyquery` & `requests`
